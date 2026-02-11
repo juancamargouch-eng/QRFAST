@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  password      String
+  image         String?
+  role          String    @default("USER") // "USER" o "ADMIN"
+  isPro         Boolean   @default(false)
+  proUntil      DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  qrs           DynamicQR[]
+}
+
+model DynamicQR {
+  id          String   @id @default(cuid())
+  shortCode   String   @unique
+  name        String?
+  targetUrl   String
+  options     Json?
+  clicks      Int      @default(0)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
